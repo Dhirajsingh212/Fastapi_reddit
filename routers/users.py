@@ -130,7 +130,7 @@ async def delete_user(user:user_dependency,db:db_dependency):
             detail="User not found"
         )
 
-    db.query(User).filter(User.id == user.get('id')).delete()
+    db.delete(user_model)
     db.commit()
 
     return UserResponse(

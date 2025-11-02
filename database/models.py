@@ -23,7 +23,10 @@ class User(Base,TimestampMixin):
     password_hash:Mapped[str] = mapped_column(String, nullable=False)
     active:Mapped[bool] = mapped_column(Boolean)
 
-    posts:Mapped[List['Post']] = relationship()
+    posts:Mapped[list['Post']] = relationship(
+        back_populates="owner",
+        cascade="save-update, delete",
+    )
 
 
 class Post(Base, TimestampMixin):
@@ -33,5 +36,5 @@ class Post(Base, TimestampMixin):
     description:Mapped[str] = mapped_column(String, nullable=False)
     owner_id:Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
 
-    owner:Mapped['User'] = relationship(back_populates="posts")
+    owner:Mapped['User'] = relationship(back_populates="posts",cascade="save-update, delete")
 

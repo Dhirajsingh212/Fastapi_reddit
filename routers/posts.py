@@ -48,8 +48,8 @@ async def create_new_post(user:user_dependency,db:db_dependency,post_request:Pos
             email=user_model.email
         ),
         message="Post created",
-        createdAt=post_model.created_at,
-        updatedAt=post_model.updated_at,
+        created_at=post_model.created_at,
+        updated_at=post_model.updated_at,
     )
 
 @router.get("/user/all",response_model=List[PostResponse],status_code=status.HTTP_200_OK)
