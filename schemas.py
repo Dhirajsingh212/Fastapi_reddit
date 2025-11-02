@@ -3,6 +3,10 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
 
+class User(BaseModel):
+    id:int
+    username:str
+    email:str
 
 class UserRequest(BaseModel):
     username: str
@@ -27,3 +31,21 @@ class UserUpdateRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class PostRequest(BaseModel):
+    title: str
+    description: str
+
+class PostResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    owner: User
+    created_at: datetime
+    updated_at: datetime
+    message:str = "Successfully done"
+    status: str = "success"
+
+class PostUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
