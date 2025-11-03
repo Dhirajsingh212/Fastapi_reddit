@@ -7,7 +7,7 @@ __init__.py
 # C extensions
 *.so
 database.db
-testing
+testing/
 # Distribution / packaging
 .Python
 build/
