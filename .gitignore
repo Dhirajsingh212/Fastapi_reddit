@@ -6,7 +6,8 @@ __init__.py
 
 # C extensions
 *.so
-
+database.db
+testing
 # Distribution / packaging
 .Python
 build/

@@ -1,9 +1,8 @@
 
 from sqlalchemy.ext.declarative import declared_attr
 from database.db import Base
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey,func
+from sqlalchemy import event, Integer, String, DateTime, Boolean, ForeignKey,func
 from sqlalchemy.orm import Mapped,mapped_column,relationship
-from typing import List
 
 class TimestampMixin:
     @declared_attr
@@ -27,6 +26,7 @@ class User(Base,TimestampMixin):
         back_populates="owner",
         cascade="all, delete-orphan",
     )
+    comments:Mapped[list['Comment']] = relationship(back_populates="owner",cascade="all, delete-orphan")
 
 
 class Post(Base, TimestampMixin):
@@ -37,3 +37,14 @@ class Post(Base, TimestampMixin):
     owner_id:Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
 
     owner:Mapped['User'] = relationship(back_populates="posts")
+    comments:Mapped[list['Comment']] = relationship(back_populates='post',cascade="all, delete-orphan")
+
+class Comment(Base, TimestampMixin):
+    __tablename__ = "comments"
+    id:Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    comment:Mapped[str] = mapped_column(String, nullable=False)
+    owner_id:Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    post_id:Mapped[int] = mapped_column(Integer, ForeignKey("posts.id"))
+
+    owner:Mapped['User'] = relationship(back_populates="comments")
+    post:Mapped['Post'] = relationship(back_populates="comments")

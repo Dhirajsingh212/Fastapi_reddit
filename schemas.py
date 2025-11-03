@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
 
 class User(BaseModel):
@@ -9,8 +9,8 @@ class User(BaseModel):
     email:str
 
 class UserRequest(BaseModel):
-    username: str
-    email: str
+    username: str = Field(min_length=5)
+    email: str = EmailStr()
     password: str
 
 
@@ -49,3 +49,26 @@ class PostResponse(BaseModel):
 class PostUpdateRequest(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
+
+class CommentRequest(BaseModel):
+    comment:str = Field(min_length=5)
+
+class CommentResponse(BaseModel):
+    id: int
+    comment:str
+    owner: User
+    post: PostResponse
+    created_at: datetime
+    updated_at: datetime
+    message:str = "Successfully done"
+    status: str = "success"
+
+class CommentWithUserDetails(BaseModel):
+    id: int
+    comment:str
+    owner: User
+    message:str = "Successfully done"
+    status: str = "success"
+
+class CommentUpdateRequest(BaseModel):
+    comment: Optional[str] = Field(None, min_length=5)

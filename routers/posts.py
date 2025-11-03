@@ -167,7 +167,7 @@ async def delete_user_post(user:user_dependency,db:db_dependency,post_id:int = P
 
     db.delete(post_model)
     db.commit()
-    db.refresh(post_model)
+
     return PostResponse(
         id=post_model.id,
         title=post_model.title,
