@@ -25,7 +25,7 @@ class User(Base,TimestampMixin):
 
     posts:Mapped[list['Post']] = relationship(
         back_populates="owner",
-        cascade="save-update, delete",
+        cascade="all, delete-orphan",
     )
 
 
@@ -36,5 +36,4 @@ class Post(Base, TimestampMixin):
     description:Mapped[str] = mapped_column(String, nullable=False)
     owner_id:Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
 
-    owner:Mapped['User'] = relationship(back_populates="posts",cascade="save-update, delete")
-
+    owner:Mapped['User'] = relationship(back_populates="posts")
