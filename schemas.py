@@ -46,6 +46,9 @@ class PostResponse(BaseModel):
     message:str = "Successfully done"
     status: str = "success"
 
+class PostResponseWithComments(PostResponse):
+    total_comments: int
+
 class PostUpdateRequest(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None

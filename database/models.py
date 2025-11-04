@@ -35,6 +35,7 @@ class Post(Base, TimestampMixin):
     title:Mapped[str] = mapped_column(String, nullable=False, unique=True)
     description:Mapped[str] = mapped_column(String, nullable=False)
     owner_id:Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    total_comments:Mapped[int] = mapped_column(Integer,default=0)
 
     owner:Mapped['User'] = relationship(back_populates="posts")
     comments:Mapped[list['Comment']] = relationship(back_populates='post',cascade="all, delete-orphan")
@@ -48,3 +49,20 @@ class Comment(Base, TimestampMixin):
 
     owner:Mapped['User'] = relationship(back_populates="comments")
     post:Mapped['Post'] = relationship(back_populates="comments")
+
+@event.listens_for(Comment, 'after_insert')
+def update_total_comment(mapper, connection, target):
+    connection.execute(
+        Post.__table__.update()
+        .where(Post.__table__.c.id == target.id)
+        .values(total_comments=Post.__table__.c.total_comments + 1)
+    )
+
+
+@event.listens_for(Comment, 'after_delete')
+def decrement_comment_count(mapper, connection, target):
+    connection.execute(
+        Post.__table__.update()
+        .where(Post.__table__.c.id == target.post_id)
+        .values(total_comments=Post.__table__.c.total_comments - 1)
+    )

@@ -135,7 +135,7 @@ async def update_comment_details(user:user_dependency,db:db_dependency,comment_r
         )
 
     updated_comment = comment_request.model_dump(exclude_unset=True)
-    if updated_comment is None:
+    if not updated_comment:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Atleast one Field is required"
