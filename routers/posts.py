@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Path, Query
-from sqlalchemy.orm import lazyload, joinedload
+from sqlalchemy.orm import joinedload
 from starlette import status
 from sqlalchemy import or_
 import schemas
