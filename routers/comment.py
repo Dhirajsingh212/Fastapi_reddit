@@ -1,11 +1,9 @@
-from cryptography.x509 import random_serial_number
-from fastapi import APIRouter, Path, HTTPException
-from pyexpat.errors import messages
+from sqlalchemy import or_
+from fastapi import APIRouter, Path, HTTPException, Query
 from sqlalchemy.orm import joinedload
 from starlette import status
-from typing import List
+from typing import List, Optional
 import schemas
-from database import db
 from database.models import Post, Comment, User
 from schemas import CommentRequest, CommentResponse, CommentWithUserDetails, CommentUpdateRequest
 from dependency import user_dependency,db_dependency
@@ -77,7 +75,15 @@ async def create_comment(user:user_dependency,db:db_dependency,comment_request:C
     )
 
 @router.get("/{post_id}",response_model=List[CommentWithUserDetails],status_code=status.HTTP_200_OK)
-async def get_all_comments_by_post(user:user_dependency,db:db_dependency,post_id:int = Path(gt=0)):
+async def get_all_comments_by_post(
+        user:user_dependency,
+        db:db_dependency,
+        post_id:int = Path(gt=0),
+        page_number:int = Query(0,gt=-1),
+        page_size:int = Query(10,gt=0,le=100),
+        search:Optional[str] = Query(None)
+    ):
+
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -98,11 +104,26 @@ async def get_all_comments_by_post(user:user_dependency,db:db_dependency,post_id
             detail="Post not found"
         )
 
-    comments = (db
+    query = (db
                 .query(Comment)
                 .filter(Comment.post_id == post_model.id)
                 .options(joinedload(Comment.owner))
-                .all())
+                )
+
+    if search:
+        search_item = f"%{search}%"
+        query = query.filter(
+            or_(Comment.comment.ilike(search_item))
+        )
+
+    total_count = query.count()
+    if page_size * page_number > total_count:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You have reached the maximum number of pages"
+        )
+
+    comments = query.offset(page_number).limit(page_size).all()
 
     return comments
 
